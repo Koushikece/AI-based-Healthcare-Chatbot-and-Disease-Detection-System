@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 13 12:29:44 2023
+Created on Fri Sept 15 11:43 , 2023
 
-@author: piku
+@author: Koushik
 """
 import nltk
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 import json
 import pickle
-
 import keras
 import numpy as np
 from keras.layers import Dense, Activation, Dropout
@@ -20,7 +19,7 @@ words=[]
 classes = []
 documents = []
 ignore_words = ['?', '!']
-data_file = open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\data.json').read()
+data_file = open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\data.json').read()
 intents = json.loads(data_file)
 
 
@@ -50,41 +49,39 @@ print (len(classes), "classes", classes)
 print (len(words), "unique lemmatized words", words)
 
 
-pickle.dump(words,open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\texts.pkl','wb'))
-pickle.dump(classes,open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\labels.pkl','wb'))
+pickle.dump(words,open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\texts.pkl','wb'))
+pickle.dump(classes,open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\labels.pkl','wb'))
 
-# create our training data
+# Create our training data
 training = []
-# create an empty array for our output
+# Create an empty array for our output
 output_empty = [0] * len(classes)
-# training set, bag of words for each sentence
+
 for doc in documents:
-    # initialize our bag of words
-    bag = []
-    # list of tokenized words for the pattern
-    pattern_words = doc[0]
-    # lemmatize each word - create base word, in attempt to represent related words
-    pattern_words = [lemmatizer.lemmatize(word.lower()) for word in pattern_words]
-    # create our bag of words array with 1, if word match found in current pattern
+    bag = []  # Initialize our bag of words
+    pattern_words = doc[0]  # List of tokenized words for the pattern
+    pattern_words = [lemmatizer.lemmatize(word.lower()) for word in pattern_words]  # Lemmatize words
+
     for w in words:
         bag.append(1) if w in pattern_words else bag.append(0)
-    
-    # output is a '0' for each tag and '1' for current tag (for each pattern)
+
+    # Output is a '0' for each tag and '1' for the current tag (for each pattern)
     output_row = list(output_empty)
     output_row[classes.index(doc[1])] = 1
-    
-    training.append([bag, output_row])
-# shuffle our features and turn into np.array
+
+    training.append(bag + output_row)  # Concatenate bag and output_row
+
+# Shuffle our features and turn into np.array
 random.shuffle(training)
 training = np.array(training)
-# create train and test lists. X - patterns, Y - intents
-train_x = list(training[:,0])
-train_y = list(training[:,1])
+
+# Split train_x (patterns) and train_y (intents)
+train_x = training[:, :len(words)]
+train_y = training[:, len(words):]
+
 print("Training data created")
 
-
-# Create model - 3 layers. First layer 128 neurons, second layer 64 neurons and 3rd output layer contains number of neurons
-# equal to number of intents to predict output intent with softmax
+# Create model - 3 layers
 model = keras.Sequential()
 model.add(Dense(128, input_shape=(len(train_x[0]),), activation='relu'))
 model.add(Dropout(0.5))
@@ -92,12 +89,12 @@ model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(len(train_y[0]), activation='softmax'))
 
-# Compile model. Stochastic gradient descent with Nesterov accelerated gradient gives good results for this model
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+# Compile model using SGD optimizer with corrected parameter names
+sgd = SGD(learning_rate=0.01, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
-#fitting and saving the model 
+# Fitting and saving the model
 hist = model.fit(np.array(train_x), np.array(train_y), epochs=200, batch_size=5, verbose=1)
-model.save('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\model.h5', hist)
+model.save('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\model.h5', hist)
 
-print("model created")
+print("Model created")

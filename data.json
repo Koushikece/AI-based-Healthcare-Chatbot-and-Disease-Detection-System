@@ -59,7 +59,7 @@
          "context": [""]
         },
         {"tag": "shivering",
-         "patterns": ["Allergy","watering_from_eyes"],
+         "patterns": ["Allergy","watering from eyes"],
          "responses": ["Get Consultation Online with Dr. Mansi. \n Please Visit : https://www.practo.com/delhi/doctor/dr-mansi-arya-bhardwaj-homeopath?specialization=Homoeopath&practice_id=786334"],
          "context": [""]
         },
@@ -75,7 +75,7 @@
          "context": [""]
         },
         {"tag": "muscle_pain",
-         "patterns": ["muscle_pain", "mild_fever"],
+         "patterns": ["muscle_pain", "mild fever"],
          "responses": ["Get Consultation Online with Dr. Gayatri. \n Please Visit : https://www.practo.com/delhi/doctor/dr-gayatri-bala-juneja-gynecologist-obstetrician-2?specialization=Gynecologist/Obstetrician&practice_id=1010694"],
          "context": [""]
         },

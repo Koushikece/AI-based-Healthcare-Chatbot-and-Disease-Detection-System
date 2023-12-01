@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 25 09:20:13 2023
+Created on Tue Sept 27 21:04 , 2023
 
-@author: piku
+@author: Koushik
 """
-
+from flask import Flask, render_template
+from subprocess import Popen
 import joblib
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
@@ -25,17 +26,21 @@ from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 
 from keras.models import load_model
-model2 = load_model('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\Disease Diagnosis\\model.h5')
+from keras.optimizers import SGD
+from keras.models import load_model
+import keras.utils
+
+# Register the custom optimizer
+keras.utils.get_custom_objects()['SGD'] = SGD
+model2 = load_model('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\model.h5')
 
 import json
 import random
-intents = json.loads(open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\Disease Diagnosis\\data.json').read())
-words = pickle.load(open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\Disease Diagnosis\\texts.pkl','rb'))
-classes = pickle.load(open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\Disease Diagnosis\\labels.pkl','rb'))
-
+intents = json.loads(open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\data.json').read())
+words = pickle.load(open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\texts.pkl','rb'))
+classes = pickle.load(open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\labels.pkl','rb'))
 
 ###############################################################################
-
 
 filename = 'diabetes-prediction-rfc-model.pkl'
 classifier = pickle.load(open(filename, 'rb'))
@@ -44,7 +49,7 @@ model1 = pickle.load(open('model1.pkl', 'rb'))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/Users/piku/OneDrive/Desktop/Disease Diagnosis System cloud/Disease Diagnosis/database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/Users/koush/OneDrive/Documents/AI-based-Healthcare-Chatbot-and-Disease-Detection-System/database.db'
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -127,6 +132,11 @@ def signup():
 @login_required
 def dashboard():
     return render_template("dashboard.html")
+
+@app.route('/predict_disease_tkinter')
+def predict_disease_tkinter():
+    Popen(['python', 'C:/Users/koush/OneDrive/Documents/AI-based-Healthcare-Chatbot-and-Disease-Detection-System/disease_prediction.py'])   
+    return render_template('predict_disease_tkinter.html')
 
 
 @app.route("/disindex")
@@ -307,8 +317,8 @@ def predictheart():
     input_features = [float(x) for x in request.form.values()]
     features_value = [np.array(input_features)]
 
-    features_name = ["age", "trestbps", "chol", "thalach", "oldpeak", "sex_0",
-                     "  sex_1", "cp_0", "cp_1", "cp_2", "cp_3", "  fbs_0",
+    features_name = ["age", "trestbps", "chol", "thalach", "oldpeak",
+                      "sex_0","  sex_1", "cp_0", "cp_1", "cp_2", "cp_3", "  fbs_0",
                      "restecg_0", "restecg_1", "restecg_2", "exang_0", "exang_1",
                      "slope_0", "slope_1", "slope_2", "ca_0", "ca_1", "ca_2", "thal_1",
                      "thal_2", "thal_3"]
@@ -322,7 +332,6 @@ def predictheart():
         res_val = "a low risk of Heart Disease"
 
     return render_template('heart_result.html', prediction_text='Patient has {}'.format(res_val))
-
 
 def clean_up_sentence(sentence):
     # tokenize the pattern - split words into array
@@ -371,9 +380,16 @@ def getResponse(ints, intents_json):
 
 def chatbot_response(msg):
     ints = predict_class(msg, model2)
+    
+    if not ints:
+        # Handle the case where no intent is recognized
+        return "I'm sorry, I couldn't understand your request."
+    
     res = getResponse(ints, intents)
     return res
 
 
+
 if __name__ == "__main__":
+    app.debug = True
     app.run()

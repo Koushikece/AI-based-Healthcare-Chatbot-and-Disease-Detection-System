@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 25 09:20:13 2023
+Created on Tue Sept 27 04:44 , 2023
 
-@author: piku
+@author: Koushik
 """
 
 import joblib
@@ -34,7 +34,7 @@ model1 = pickle.load(open('model1.pkl', 'rb'))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/Users/piku/OneDrive/Desktop/Disease Diagnosis System cloud/Disease Diagnosis/database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\database.db'
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -293,8 +293,8 @@ def predictheart():
     input_features = [float(x) for x in request.form.values()]
     features_value = [np.array(input_features)]
 
-    features_name = ["age", "trestbps", "chol", "thalach", "oldpeak", "sex_0",
-                     "  sex_1", "cp_0", "cp_1", "cp_2", "cp_3", "  fbs_0",
+    features_name = ["age", "trestbps", "chol", "thalach", "oldpeak",
+                     "  sex", "cp_0", "cp_1", "cp_2", "cp_3", "  fbs_0",
                      "restecg_0", "restecg_1", "restecg_2", "exang_0", "exang_1",
                      "slope_0", "slope_1", "slope_2", "ca_0", "ca_1", "ca_2", "thal_1",
                      "thal_2", "thal_3"]
@@ -310,10 +310,10 @@ def predictheart():
     return render_template('heart_result.html', prediction_text='Patient has {}'.format(res_val))
 
 
-model = load_model('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\model.h5')
-intents = json.loads(open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\data.json').read())
-words = pickle.load(open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\texts.pkl','rb'))
-classes = pickle.load(open('C:\\Users\\piku\\OneDrive\\Desktop\\Disease Diagnosis System cloud\\chatbot-app\\labels.pkl','rb'))
+model = load_model('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\model.h5')
+intents = json.loads(open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\data.json').read())
+words = pickle.load(open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\texts.pkl','rb'))
+classes = pickle.load(open('C:\\Users\\koush\\OneDrive\\Documents\\AI-based-Healthcare-Chatbot-and-Disease-Detection-System\\labels.pkl','rb'))
 
 def clean_up_sentence(sentence):
     # tokenize the pattern - split words into array
